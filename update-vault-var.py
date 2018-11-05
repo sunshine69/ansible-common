@@ -7,6 +7,8 @@ Still complex htings to do, we can load and decrypt teh yml file but to
 reencrypt back we need a way to devetxt variables which is vaulted and encrypt
 back. No time for now, maybe in the future ...
 
+status: TODO
+
 """
 import codecs
 import yaml
