@@ -6,9 +6,8 @@
 import os
 import re
 import sys
-sys.path.append('tools')
 
-from helper import *
+from tools.helper import *
 
 import yaml
 

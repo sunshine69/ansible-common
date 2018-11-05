@@ -1,0 +1,6 @@
+projectKey=ansible
+serverUrl=http://172.17.0.2:9000
+serverVersion=6.7.3.38370
+dashboardUrl=http://172.17.0.2:9000/dashboard/index/ansible
+ceTaskId=AWNnjB4ZrQmXfeRe4Fwm
+ceTaskUrl=http://172.17.0.2:9000/api/ce/task?id=AWNnjB4ZrQmXfeRe4Fwm

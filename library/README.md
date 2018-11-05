@@ -9,6 +9,9 @@ ec2_scaling_policy.py            | https://github.com/ansible/ansible/pull/26476
 ec2_snapshot.py                  | https://github.com/ansible/ansible/pull/22394 | Unmerged
 aws_kms.py                       | https://github.com/ansible/ansible/pull/31960 | Unmerged
 rds_option_group.py              | https://github.com/ansible/ansible/pull/25290 | Unmerged
-win_disk_management.ps1          | https://github.com/ansible/ansible/pull/27634 | Unmerged
-win_get_url.ps1                  | https://github.com/ansible/ansible/pull/32389 | Available in 2.5
-win_iis_webbinding.ps1           |                                               | Available in 2.5
+rds_instance.py	                 | https://github.com/ansible/ansible/pull/30746 | Unmerged
+rds_instance_facts.py	           | https://github.com/ansible/ansible/pull/26598 | Unmerged
+win_scheduled_task.py            | https://github.com/ansible/ansible/pull/28995 | Merged to devel
+win_disk_management.py           | https://github.com/ansible/ansible/pull/27634 | Unmerged
+s3_bucket.py                     | From stable version 2.5.x                     | Bug since 2.6.x
+s3_lifecycle.py                  | From stable version 2.5.x                     | Bug since 2.5.x
