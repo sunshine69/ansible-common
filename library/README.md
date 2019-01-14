@@ -15,3 +15,6 @@ win_scheduled_task.py            | https://github.com/ansible/ansible/pull/28995
 win_disk_management.py           | https://github.com/ansible/ansible/pull/27634 | Unmerged
 s3_bucket.py                     | From stable version 2.5.x                     | Bug since 2.6.x
 s3_lifecycle.py                  | From stable version 2.5.x                     | Bug since 2.5.x
+efs_facts.py                       | https://github.com/ansible/ansible/pull/31817 | Unmerged              |
+route53_facts.py                   | https://github.com/ansible/ansible/pull/31860 | Unmerged              |
+route53_zone.py                    | https://github.com/ansible/ansible/pull/21646 | Unmerged              |
