@@ -1,7 +1,6 @@
 def generate_add_user_script() {
     stage('generate_add_user_script') {
         script {
-          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'ansible-common']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'xvt-product-registration1', url: 'git@github.com:XVTSolutions/ansible-common.git']]]
           sh '''#!/bin/sh
               my_UID=$(id -u)
               my_GID=$(id -g)
@@ -59,12 +58,29 @@ git reset --hard
 
 def run_build_script() {
     stage('run_build_script') {
-      docker.image('xvtsolutions/python3-aws-ansible:2.7.9').withRun('-u root --volumes-from xvt_jenkins --net=container:xvt') { c->
-        sh "docker exec --workdir ${WORKSPACE} ${c.id} bash ./generate_add_user_script.sh"
-        sh "docker exec --user jenkins --workdir ${WORKSPACE} ${c.id} ./generate_aws_environment.sh"
-        sh "docker exec --user jenkins --workdir ${WORKSPACE} ${c.id} ./build.sh"
-        sh 'rm -rf build.sh add-user.sh ~/.aws ~/.ansible ubuntu'
-      }//docker env
+        script {
+            docker.image('xvtsolutions/python3-aws-ansible:2.7.9').withRun('-u root --volumes-from xvt_jenkins --net=container:xvt') { c->
+                if (fileExists 'generate_add_user_script.sh') {
+                    sh "docker exec --workdir ${WORKSPACE} ${c.id} bash ./generate_add_user_script.sh"
+                } 
+                else {
+                    echo 'generate_add_user_script.sh does not exist - skipping'
+                }
+                if (fileExists 'generate_aws_environment.sh') {
+                    sh "docker exec --user jenkins --workdir ${WORKSPACE} ${c.id} ./generate_aws_environment.sh"
+                }
+                else {
+                    echo 'generate_aws_environment.sh does not exist - skipping'
+                }
+                if (fileExists 'build.sh') {
+                    sh "docker exec --user jenkins --workdir ${WORKSPACE} ${c.id} ./build.sh"
+                }
+                else {
+                    echo 'build.sh does not exist - skipping'
+                }
+                sh 'rm -rf build.sh add-user.sh ~/.aws ~/.ansible ubuntu || true'
+            }//docker env
+        }//script
     }//stage
 }
 
