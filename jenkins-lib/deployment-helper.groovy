@@ -128,7 +128,28 @@ def load_upstream_build_data() {
 }
 
 
-def get_build_by_name_env(job_name, param_filter=['ENV': 'int']) {
+def is_sub_map(m0, m1, regex_match=false) {
+    def filter_keys = m0.keySet()
+    def output = true
+    for (filter_key in filter_keys) {
+        if (! regex_match) {
+            if (! (m1.containsKey(filter_key) && m1[filter_key] == m0[filter_key]) ) {
+                output = false
+            }
+        }
+        else {
+            def m0_val = m0[filter_key]
+            def m1_val = m1[filter_key]
+            if (! (m1.containsKey(filter_key) && m1_val.matches(".*${m0_val}.*")))  {
+                output = false
+            }
+        }
+    }
+    return output
+}
+
+
+def get_build_by_name_env(job_name, param_filter=[:], regex_match=false) {
     stage('get_build_by_name_env') {
         script {
             def output = [:]
@@ -145,7 +166,7 @@ def get_build_by_name_env(job_name, param_filter=['ENV': 'int']) {
                         current_param[param.name] = param.value
                     }
                      if (jobBuilds[i].getResult().toString().equals("SUCCESS") &&
-                         is_sub_map(param_filter, current_param)) {
+                         is_sub_map(param_filter, current_param, regex_match)) {
                         selected_param = parameters
                         break
                      }
