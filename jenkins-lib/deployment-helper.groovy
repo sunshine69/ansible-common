@@ -17,7 +17,6 @@ def generate_add_user_script() {
 
               mkdir -p /home/$my_NAME >/dev/null 2>&1
               chown -R $my_NAME:$my_GID /home/$my_NAME
-              # $WORKSPACE
           '''
           sh 'chmod +x generate_add_user_script.sh'
         }//script
@@ -59,13 +58,16 @@ printf "[$PROFILE]
 aws_access_key_id = ${AWS_ACCESS_KEY_ID}
 aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/credentials
 
+LOGIN_USER=\\$(whoami)
+
 if [ "${VAULT}" != "" ]; then
-    VAULT_FILE=\\$(grep -Po '(?<=vault_password_file = )[^\\s]+' ansible.cfg)
-    mkdir -p \\$(dirname \\${VAULT_FILE})
-    echo "${VAULT}" > \\${VAULT_FILE}
-    chmod 0600 \\${VAULT_FILE}
+    VAULT_FILE=\\$(grep -Po '(?<=vault_password_file = )[^\\s]+' ansible.cfg | sed 's/~\\///')
+    echo "Vault file path: ~/\\${VAULT_FILE}"
+    mkdir -p \\$(dirname ~/\\${VAULT_FILE})
+    echo "${VAULT}" > ~/\\${VAULT_FILE}
+    chmod 0600 ~/\\${VAULT_FILE}
     echo "Vault file: "
-    ls -lha "\\${VAULT_FILE}"
+    ls -lha "~/\\${VAULT_FILE}"
     sed -i "s|git+ssh://git|https://${GITHUB_TOKEN}|g" requirements.yml
     ./ansible-common/update-galaxy.py
 fi
