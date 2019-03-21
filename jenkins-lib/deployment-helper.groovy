@@ -159,7 +159,7 @@ def get_build_by_name_env(job_name, param_filter=[:], regex_match=false) {
 
             Jenkins.instance.getAllItems(Job).findAll() {job -> job.name =~ /$job_name/}.each{
                 def selected_param
-                def jobBuilds = it.getBuilds().reverse()
+                def jobBuilds = it.getBuilds()
                 for (i=0; i < jobBuilds.size(); i++) {
                     def parameters = jobBuilds[i].getAction(ParametersAction)?.parameters
 
