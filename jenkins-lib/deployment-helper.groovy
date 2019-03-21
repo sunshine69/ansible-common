@@ -64,6 +64,8 @@ if [ "${VAULT}" != "" ]; then
     mkdir -p \\$(dirname \\${VAULT_FILE})
     echo "${VAULT}" > \\${VAULT_FILE}
     chmod 0600 \\${VAULT_FILE}
+    echo "Vault file: "
+    ls -lha "\\${VAULT_FILE}"
     sed -i "s|git+ssh://git|https://${GITHUB_TOKEN}|g" requirements.yml
     ./ansible-common/update-galaxy.py
 fi
