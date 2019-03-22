@@ -17,7 +17,6 @@ def generate_add_user_script() {
 
               mkdir -p /home/$my_NAME >/dev/null 2>&1
               chown -R $my_NAME:$my_GID /home/$my_NAME
-              # $WORKSPACE
           '''
           sh 'chmod +x generate_add_user_script.sh'
         }//script
@@ -59,11 +58,16 @@ printf "[$PROFILE]
 aws_access_key_id = ${AWS_ACCESS_KEY_ID}
 aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}" > ~/.aws/credentials
 
+LOGIN_USER=\\$(whoami)
+
 if [ "${VAULT}" != "" ]; then
-    VAULT_FILE=\\$(grep -Po '(?<=vault_password_file = )[^\\s]+' ansible.cfg)
-    mkdir -p \\$(dirname \\${VAULT_FILE})
-    echo "${VAULT}" > \\${VAULT_FILE}
-    chmod 0600 \\${VAULT_FILE}
+    VAULT_FILE=\\$(grep -Po '(?<=vault_password_file = )[^\\s]+' ansible.cfg | sed 's/~\\///')
+    echo "Vault file path: ~/\\${VAULT_FILE}"
+    mkdir -p \\$(dirname ~/\\${VAULT_FILE})
+    echo "${VAULT}" > ~/\\${VAULT_FILE}
+    chmod 0600 ~/\\${VAULT_FILE}
+    echo "Vault file: "
+    ls -lha "~/\\${VAULT_FILE}"
     sed -i "s|git+ssh://git|https://${GITHUB_TOKEN}|g" requirements.yml
     ./ansible-common/update-galaxy.py
 fi
@@ -81,7 +85,7 @@ def run_build_script() {
             docker.image('xvtsolutions/python3-aws-ansible:2.7.9').withRun('-u root --volumes-from xvt_jenkins --net=container:xvt') { c->
                 if (fileExists('generate_add_user_script.sh')) {
                     sh "docker exec --workdir ${WORKSPACE} ${c.id} bash ./generate_add_user_script.sh"
-                } 
+                }
                 else {
                     echo 'generate_add_user_script.sh does not exist - skipping'
                 }
@@ -126,5 +130,61 @@ def load_upstream_build_data() {
         }//script
     }//stage
 }
+
+
+def is_sub_map(m0, m1, regex_match=false) {
+    def filter_keys = m0.keySet()
+    def output = true
+    for (filter_key in filter_keys) {
+        if (! regex_match) {
+            if (! (m1.containsKey(filter_key) && m1[filter_key] == m0[filter_key]) ) {
+                output = false
+            }
+        }
+        else {
+            def m0_val = m0[filter_key]
+            def m1_val = m1[filter_key]
+            if (! (m1.containsKey(filter_key) && m1_val.matches(".*${m0_val}.*")))  {
+                output = false
+            }
+        }
+    }
+    return output
+}
+
+
+def get_build_by_name_env(job_name, param_filter=[:], regex_match=false) {
+    stage('get_build_by_name_env') {
+        script {
+            def output = [:]
+            def selected_build
+
+            Jenkins.instance.getAllItems(Job).findAll() {job -> job.name =~ /$job_name/}.each{
+                def selected_param
+                def jobBuilds = it.getBuilds()
+                for (i=0; i < jobBuilds.size(); i++) {
+                    def parameters = jobBuilds[i].getAction(ParametersAction)?.parameters
+
+                    def current_param = [:]
+                    for (param in parameters) {
+                        current_param[param.name] = param.value
+                    }
+                     if (jobBuilds[i].getResult().toString().equals("SUCCESS") &&
+                         is_sub_map(param_filter, current_param, regex_match)) {
+                        selected_param = parameters
+                        break
+                     }
+
+                }
+
+                selected_param.each {
+                    output[it.name] = it.value
+                }
+            }
+            return output
+        }//script
+    }//stage
+}
+
 
 return this
