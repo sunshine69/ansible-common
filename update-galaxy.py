@@ -20,7 +20,7 @@ def update_requirement_file():
     print("To be implemented")
 
 def delete_local():
-    req = yaml.load(open('requirements.yml','r').read())
+    req = yaml.load(open('requirements.yml','r').read(), Loader=yaml.FullLoader)
     for role_from_requirement in req:
         ver_from_requirements = role_from_requirement['version']
         try:
@@ -39,7 +39,7 @@ def update_galaxy_role():
     version specified in the requirements file.
     """
 
-    req = yaml.load(open('requirements.yml','r').read())
+    req = yaml.load(open('requirements.yml','r').read(), Loader=yaml.FullLoader)
 
     output, c, _ = run_cmd('ansible-galaxy list', shlex=True)
 
