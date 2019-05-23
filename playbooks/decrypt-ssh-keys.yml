@@ -1,0 +1,27 @@
+- name: Decrypt ssh key
+  hosts: env-{{ env }}-runner
+  connection: local
+  gather_facts: false
+  vars_files:
+    - "{{ inventory_dir }}/../variable_files/aws_account/{{ aws_account_name }}_vault_vars.yml"
+  tasks:
+    - name: assert .ssh dir exists
+      file:
+        path: "~/.ssh"
+        state: directory
+        mode: "0700"
+
+    - name: Deploy the ssh config file
+      copy:
+        src: "{{ inventory_dir }}/../files/ssh.config"
+        dest: "~/.ssh/config"
+
+    - name: Decrypt the key for automation
+      shell: >
+        openssl rsa -passin pass:{{ item.value.passphrase }}
+        -in {{ inventory_dir }}/../roles/ec2_sshkey/files/{{ item.value.name }}
+        -out ~/.ssh/{{ item.value.name }};
+        chmod 0600 ~/.ssh/{{ item.value.name }};
+        ls -lha ~/.ssh/{{ item.value.name }};
+      with_dict: "{{ ssh_keys }}"
+      no_log: true

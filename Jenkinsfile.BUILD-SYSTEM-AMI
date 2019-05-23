@@ -33,7 +33,7 @@ pipeline {
 # role_type }} to the ansible command but this only works for build ami image -
 # not work if we want to deploy on the fly. This works for all cases
 
-ansible-playbook playbooks/environments/decrypt-ssh-keys.yml -e "env=central-non-prod"
+ansible-playbook ansible-common/playbooks/decrypt-ssh-keys.yml -e "env=central-non-prod"
 
 # AMI_IMAGE_NAME: ubuntu-1804
 # Look into var `ami_images` in all.yml - this is the key of this dict so we
