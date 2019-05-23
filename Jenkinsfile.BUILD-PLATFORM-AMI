@@ -1,0 +1,88 @@
+pipeline {
+    environment {
+        DOCKER_TLS_VERIFY=true
+        DOCKER_TLS=true
+        DOCKER_HOST="tcp://docker-host.xvt.internal:2376"
+        DOCKER_CA_PATH="/var/jenkins_home/.docker"
+        DOCKER_CERT_PATH="/var/jenkins_home/.docker"
+    }
+    agent { label 'master' }
+    stages {
+        stage('Load ansible-common') {
+            steps {
+                script {
+                  checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: true, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'jenkins-helper'], [$class: 'CloneOption', noTags: true, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'xvt-product-registration1', url: 'git@github.com:XVTSolutions/jenkins-helper.git']]])
+                  utils = load("${WORKSPACE}/jenkins-helper/deployment.groovy")
+                }//script
+            }//steps
+        }//stage
+
+        stage('Checkout source code and generate add user script') {
+            steps {
+                script {
+                  utils.generate_add_user_script()
+                  env.ANSIBLE_VAULT_ID = 'ANSIBLE_VAULT_FILE_ACT2' //Allow the next call to setup ansible
+                  PROFILE=
+                  utils.generate_aws_environment()
+                  sh '''cat <<EOF > build.sh
+#!/bin/bash -e
+
+# Decrypt ssh key. We can get away with this by using option
+# generate_ephemeral_key=True ec2_key_pair=build-ami-{{ env_name }}-{{
+# role_type }} to the ansible command but this only works for build ami image -
+# not work if we want to deploy on the fly. This works for all cases
+
+ansible-playbook playbooks/environments/decrypt-ssh-keys.yml -e "env=central-non-prod"
+
+# PLATFORM: java|php
+# This is the key of the dict `ami_system_version` in build-platform.yml -
+# allow us to look up the system ami to build the platform ami
+# See inventory/builder-layer.config to add new platform
+
+ansible-playbook playbooks/build_ami/build_platform_ami.yml  -e "profile=$PROFILE platform=$PLATFORM" -vv
+
+rm -rf ~/.aws ~/.ansible ~/.ssh
+EOF
+'''
+                    sh 'chmod +x build.sh'
+                    sh 'cat build.sh'
+                }//script
+            }//steps
+        }
+
+       stage('Run the command within the docker environment') {
+            steps {
+                script {
+                    utils.run_build_script()
+                }//script
+            }//steps
+       }//stage
+
+    }
+    post {
+        always {
+            script {
+              currentBuild.description = """PROFILE: ${PROFILE}<br/>
+PLATFORM: ${PLATFORM}
+"""
+            }//script
+        }
+        success {
+            script {
+            slackSend baseUrl: 'https://xvt.slack.com/services/hooks/jenkins-ci/', botUser: true, channel: '#devops', message: "@here SUCCESS - ${JOB_NAME} (${BUILD_URL})", teamDomain: 'xvt', tokenCredentialId: 'jenkins-ci-integration-token', color: "good"
+            }
+        }
+        unstable {
+            echo 'I am unstable :/'
+        }
+        failure {
+            slackSend baseUrl: 'https://xvt.slack.com/services/hooks/jenkins-ci/', botUser: true, channel: '#devops', message: "@here CRITICAL - ${JOB_NAME} (${BUILD_URL})", teamDomain: 'xvt', tokenCredentialId: 'jenkins-ci-integration-token', color: "danger"
+            mail bcc: '', body: """JOB $JOB_NAME on $NODE_NAME has finished with FAILURE!
+BUILD_NUMBER: ${BUILD_NUMBER}
+BUILD_URL: ${BUILD_URL}""", cc: 'ops@xvt.com.au', from: 'ops@xvt.com.au', replyTo: 'ops@xvt.com.au', subject: "CRITICAL - $JOB_NAME on $NODE_NAME;", to: 'ops@xvt.com.au'
+        }
+        changed {
+            echo "Some changes"
+        }
+    }
+}
