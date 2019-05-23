@@ -1,3 +1,7 @@
+// NOTICE This file has been moved to the
+// [repo](https://github.com/XVTSolutions/jenkins-helper/blob/master/deployment.groovy)
+// and no logner maintained in here. We do nto remove it as some old project
+// not updated yet may still use this file.
 def generate_add_user_script() {
     stage('generate_add_user_script') {
         script {
