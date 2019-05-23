@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                   utils.generate_add_user_script()
-                  env.ANSIBLE_VAULT_ID = 'ANSIBLE_VAULT_FILE_ACT2' //Allow the next call to setup ansible
+                  env.ANSIBLE_VAULT_ID = "${ANSIBLE_VAULT_FILE}" //Allow the next call to setup ansible
                   PROFILE=
                   utils.generate_aws_environment()
                   sh '''cat <<EOF > build.sh
@@ -34,12 +34,18 @@ pipeline {
 # not work if we want to deploy on the fly. This works for all cases
 
 ansible-playbook ansible-common/playbooks/decrypt-ssh-keys.yml -e "env=central-non-prod"
+STATUS="\\$?"
+echo "ansible status code: \\$STATUS"
+[ "\\$STATUS" != '0' ] && exit 1
 
 # AMI_IMAGE_NAME: ubuntu-1804
 # Look into var `ami_images` in all.yml - this is the key of this dict so we
 # can lookup the origin aws ami to use as base.
 
 ansible-playbook playbooks/build_ami/build_system_ami.yml -e "profile=$PROFILE ami_image_name=$AMI_IMAGE_NAME" -vv
+STATUS="\\$?"
+echo "ansible status code: \\$STATUS"
+[ "\\$STATUS" != '0' ] && exit 1
 
 rm -rf ~/.aws ~/.ansible ~/.ssh
 EOF
