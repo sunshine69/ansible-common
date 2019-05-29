@@ -15,10 +15,11 @@ win_scheduled_task.py            | https://github.com/ansible/ansible/pull/28995
 win_disk_management.py           | https://github.com/ansible/ansible/pull/27634 | Unmerged
 s3_bucket.py                     | From stable version 2.5.x                     | Bug since 2.6.x
 s3_lifecycle.py                  | From stable version 2.5.x                     | Bug since 2.5.x
-ec2_vpc_net_facts.py               | https://github.com/ansible/ansible/pull/25375 | Available in 2.5      |
-ec2_vpc_subnet.py                  | https://github.com/ansible/ansible/pull/31870 | Unmerged              |
-ec2_vpc_subnet_facts.py            | https://github.com/ansible/ansible/pull/25374 | Available in 2.5      |
-efs_facts.py                       | https://github.com/ansible/ansible/pull/31817 | Unmerged              |
-route53_facts.py                   | https://github.com/ansible/ansible/pull/31860 | Unmerged              |
-route53_zone.py                    | https://github.com/ansible/ansible/pull/21646 | Unmerged              |
-ec2_vpc_route_table.py             | https://github.com/ansible/ansible/pull/37010 | Merged to devel       |
+ec2_vpc_net_facts.py             | https://github.com/ansible/ansible/pull/25375 | Available in 2.5      |
+ec2_vpc_subnet.py                | https://github.com/ansible/ansible/pull/31870 | Unmerged              |
+ec2_vpc_subnet_facts.py          | https://github.com/ansible/ansible/pull/25374 | Available in 2.5      |
+efs_facts.py                     | https://github.com/ansible/ansible/pull/31817 | Unmerged              |
+route53_facts.py                 | https://github.com/ansible/ansible/pull/31860 | Unmerged              |
+route53_zone.py                  | https://github.com/ansible/ansible/pull/21646 | Unmerged              |
+ec2_vpc_route_table.py           | https://github.com/ansible/ansible/pull/37010 | Merged to devel       |
+ecs_ecr.py                       | https://github.com/ansible/ansible/pull/32137 | Unknown - Added lifecycle policy feature |
