@@ -66,7 +66,7 @@ from collections import MutableMapping
 
 from ansible import constants as C
 from ansible.errors import AnsibleParserError
-from ansible.plugins.cache import FactCache
+from ansible.vars.fact_cache import FactCache
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.module_utils._text import to_native
 
