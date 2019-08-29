@@ -23,3 +23,4 @@ route53_facts.py                 | https://github.com/ansible/ansible/pull/31860
 route53_zone.py                  | https://github.com/ansible/ansible/pull/21646 | Unmerged              |
 ec2_vpc_route_table.py           | https://github.com/ansible/ansible/pull/37010 | Merged to devel       |
 ecs_ecr.py                       | https://github.com/ansible/ansible/pull/32137 | Unknown - Added lifecycle policy feature |
+uri.py                           | not yet create pr - inhouse - allowelapse_time return in millisec  | Unknown
