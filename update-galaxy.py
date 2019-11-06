@@ -79,7 +79,7 @@ def update_galaxy_role():
         if role_need_to_update['remove']:
             o, c, e = run_cmd('ansible-galaxy remove %s' % role_need_to_update['name'], shlex=True)
 
-        o, c, e = run_cmd('ansible-galaxy -r requirements.yml install %s' % role_need_to_update['name'], shlex=True)
+        o, c, e = run_cmd('ansible-galaxy install -r requirements.yml %s' % role_need_to_update['name'], shlex=True)
         if c != 0:
             print(c, e)
 
