@@ -18,10 +18,9 @@
 
     - name: Decrypt the key for automation
       shell: >
-        openssl rsa -passin pass:{{ item.value.passphrase }}
-        -in {{ inventory_dir }}/../roles/ec2_sshkey/files/{{ item.value.name }}
-        -out ~/.ssh/{{ item.value.name }};
-        chmod 0600 ~/.ssh/{{ item.value.name }};
+        chmod 0600 {{ inventory_dir }}/../roles/ec2_sshkey/files/{{ item.value.name }};
+        ssh-keygen -p -P {{ item.value.passphrase }} -N "" -f {{ inventory_dir }}/../roles/ec2_sshkey/files/{{ item.value.name }};
+        cp {{ inventory_dir }}/../roles/ec2_sshkey/files/{{ item.value.name }} ~/.ssh/{{ item.value.name }};
         ls -lha ~/.ssh/{{ item.value.name }};
       with_dict: "{{ ssh_keys }}"
       no_log: true
