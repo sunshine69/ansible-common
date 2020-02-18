@@ -1,3 +1,13 @@
+/* Generic build system ami across the projects
+Jenkins param required:
+PROFILE - aws profile
+CENTRAL_NAME - the central_name of the ansible stack
+BRANCH - git branch of the ansible stack
+ANSIBLE_VAULT_FILE - The ansible vault ID defined in Jenkins for this aws stack. Eg. ANSIBLE_VAULT_FILE_R2R
+AMI_IMAGE_NAME - See the list defined in inventory/group_vars/all.yml search for ami_images:
+
+*/
+
 pipeline {
     environment {
         DOCKER_TLS_VERIFY=true
@@ -33,7 +43,7 @@ pipeline {
 # role_type }} to the ansible command but this only works for build ami image -
 # not work if we want to deploy on the fly. This works for all cases
 
-ansible-playbook ansible-common/playbooks/decrypt-ssh-keys.yml -e "env=central-non-prod"
+ansible-playbook ansible-common/playbooks/decrypt-ssh-keys.yml -e "env=$CENTRAL_NAME"
 STATUS="\\$?"
 echo "ansible status code: \\$STATUS"
 [ "\\$STATUS" != '0' ] && exit 1
