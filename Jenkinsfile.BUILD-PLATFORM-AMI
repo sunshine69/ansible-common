@@ -59,7 +59,7 @@ EOF
        stage('Run the command within the docker environment') {
             steps {
                 script {
-                    utils.run_build_script()
+                    utils.run_build_script(['docker_image':'xvtsolutions/python3-aws-ansible:2.9.5'])
                 }//script
             }//steps
        }//stage
