@@ -1,0 +1,28 @@
+- name: Deploy nagios ssh key
+  block:
+    - file:
+        path: "~/.ssh"
+        state: directory
+        mode: "0700"
+    - name: Deploy the ssh config file
+      copy:
+        src: "{{ inventory_dir }}/../files/ssh.config"
+        dest: "~/.ssh/config"
+    - name: Copy the ssh key over
+      copy:
+        src: "{{ inventory_dir }}/../files/ssh/xvt_aws-environments-deployment"
+        dest: "~/.ssh/xvt_aws-environments-deployment"
+        mode: "0600"
+  delegate_to: localhost
+
+- name: Schedule {{ nagios_action }} for the service {{ nagios_service }}
+  nagios:
+    action: "{{ nagios_action }}"
+    minutes: "{{ nagios_downtime_period|default(30) }}"
+    services: "{{ nagios_service }}"
+    host: "{{ nagios_host }}"
+    comment: "{{ nagios_comment|default('Deployment in progress') }}"
+  delegate_to: {{ nagios_private_ip }}
+  become: yes
+  vars:
+    ansible_user: centos
